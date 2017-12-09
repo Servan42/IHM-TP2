@@ -2,7 +2,7 @@ package grapher.ui;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -21,15 +21,19 @@ public class Main extends Application {
 		
 		root.setCenter(canvas);
 
-		ToolBar boutons = new ToolBar(new Button("+") {
-			public void fire() {
+		Button buttonP = new Button("+");
+		buttonP.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent arg0) {
 				canvas.add();
 			}
-		}, new Button("-") {
-			public void fire() {
+		});
+		Button buttonM = new Button("-");
+		buttonM.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent arg0) {
 				canvas.remove();
 			}
 		});
+		ToolBar boutons = new ToolBar(buttonP, buttonM);
 
 		// HBox boutons = new HBox(new Button("+"),new Button("-"));
 
