@@ -10,6 +10,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
 import javafx.scene.input.KeyCode;
@@ -23,6 +24,10 @@ public class Main extends Application {
 		BorderPane root = new BorderPane();
 		
 		TableView<String> table = new TableView();
+		//table.setEditable(false);
+		TableColumn expressionCol = new TableColumn("Expression");
+		TableColumn colorCol = new TableColumn("Couleur");
+		table.getColumns().addAll(expressionCol,colorCol);
 		
 		ListView<String> funList = new ListView<String>();
 		funList.getItems().addAll(getParameters().getRaw());
@@ -65,7 +70,8 @@ public class Main extends Application {
 		MenuBar menubar = new MenuBar(menu1);
 		
 		BorderPane listSide = new BorderPane();
-		listSide.setCenter(funList);
+		//listSide.setCenter(funList);
+		listSide.setCenter(table);
 		listSide.setBottom(boutons);
 
 		SplitPane fenetre = new SplitPane();
