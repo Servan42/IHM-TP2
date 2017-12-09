@@ -43,7 +43,7 @@ public class GrapherCanvas extends Canvas {
 
 	protected Vector<Function> functions = new Vector<Function>();
 
-	protected ListView funList;
+	protected ListView<String> funList;
 
 	public GrapherCanvas(Parameters params) {
 		super(WIDTH, HEIGHT);
@@ -60,7 +60,7 @@ public class GrapherCanvas extends Canvas {
 		}
 	}
 
-	public GrapherCanvas(Parameters params, ListView funList) {
+	public GrapherCanvas(Parameters params, ListView<String> funList) {
 		super(WIDTH, HEIGHT);
 		xmin = -PI / 2.;
 		xmax = 3 * PI / 2;
