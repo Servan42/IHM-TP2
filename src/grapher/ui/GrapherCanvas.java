@@ -284,6 +284,19 @@ public class GrapherCanvas extends Canvas {
 		redraw();
 	}
 
+	public void add(){
+		
+	}
+	
+	public void remove(){
+		int i;
+		if(!funList.getSelectionModel().isEmpty()) {
+			for(i=0; i<functions.size() && !funList.getSelectionModel().selectedItemProperty().getValue().toString().equals(functions.get(i).toString()); i++) ;
+			functions.remove(functions.get(i));
+			funList.getItems().remove(funList.getSelectionModel().getSelectedIndex());
+		}
+	}
+	
 	class Handler implements EventHandler<MouseEvent> {
 		Point2D p;
 		Point2D p2;
