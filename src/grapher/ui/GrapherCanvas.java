@@ -5,10 +5,22 @@ import static java.lang.Math.*;
 import java.util.Optional;
 import java.util.Vector;
 
+import javax.xml.transform.ErrorListener;
+import javax.xml.transform.TransformerException;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.traversal.NodeIterator;
+
+import com.sun.org.apache.xalan.internal.extensions.ExpressionContext;
+import com.sun.org.apache.xml.internal.utils.QName;
+import com.sun.org.apache.xpath.internal.XPathContext;
+import com.sun.org.apache.xpath.internal.objects.XObject;
+
 import javafx.util.converter.DoubleStringConverter;
 
 import javafx.application.Application.Parameters;
 import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 
@@ -18,6 +30,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -25,6 +38,7 @@ import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 
 import grapher.fc.*;
+import grapher.ui.Main.ExprCol;
 
 public class GrapherCanvas extends Canvas {
 	static final double MARGIN = 40;
@@ -49,6 +63,8 @@ public class GrapherCanvas extends Canvas {
 	protected Vector<Function> functions = new Vector<Function>();
 
 	protected ListView<String> funList;
+	protected TableView<ExprCol> funTab;
+	protected ObservableList<ExprCol> funOList;
 
 	public GrapherCanvas(Parameters params) {
 		super(WIDTH, HEIGHT);
@@ -80,6 +96,26 @@ public class GrapherCanvas extends Canvas {
 		}
 		this.funList = funList;
 		funList.getSelectionModel().getSelectedItems().addListener(new listListen());
+	}
+
+	public GrapherCanvas(Parameters params, TableView<ExprCol> funTab, ObservableList<ExprCol> funOList) {
+		super(WIDTH, HEIGHT);
+		xmin = -PI / 2.;
+		xmax = 3 * PI / 2;
+		ymin = -1.5;
+		ymax = 1.5;
+
+		addEventHandler(MouseEvent.ANY, new Handler());
+		addEventHandler(ScrollEvent.ANY, new SHandler());
+
+		for (String param : params.getRaw()) {
+			functions.add(FunctionFactory.createFunction(param));
+		}
+		this.funTab = funTab;
+		this.funOList = funOList;
+		funTab.getSelectionModel().getSelectedItems().addListener(new tabListen());
+		funOList.addListener(new tabListen());
+		// funList.getSelectionModel().getSelectedItems().addListener(new listListen());
 	}
 
 	public double minHeight(double width) {
@@ -165,8 +201,13 @@ public class GrapherCanvas extends Canvas {
 				Ys[i] = Y(f.y(xs[i]));
 			}
 
-			if (!funList.getSelectionModel().isEmpty()
-					&& funList.getSelectionModel().selectedItemProperty().getValue().toString().equals(f.toString()))
+			// if (!funList.getSelectionModel().isEmpty()
+			// &&
+			// funList.getSelectionModel().selectedItemProperty().getValue().toString().equals(f.toString()))
+			// gc.setLineWidth(2);
+			// else
+			if (!funTab.getSelectionModel().isEmpty()
+					&& funTab.getSelectionModel().getSelectedItem().getExpression().equals(f.toString()))
 				gc.setLineWidth(2);
 			else
 				gc.setLineWidth(1);
@@ -289,32 +330,55 @@ public class GrapherCanvas extends Canvas {
 		redraw();
 	}
 
-	public void add(){
+	public void add() {
 		Optional<String> result;
 		TextInputDialog box = new TextInputDialog("Votre fonction");
 		box.setHeaderText("Expression");
 		box.setContentText("Nouvelle expression");
 		box.setTitle("Expression");
-		
+
 		result = box.showAndWait();
-		
-		if(result.isPresent()) {
+
+		if (result.isPresent()) {
 			try {
 				functions.add(FunctionFactory.createFunction(result.get()));
-				funList.getItems().add(result.get());
-				redraw();
-			} catch(Exception e) {
+				// funList.getItems().add(result.get());
+				funOList.add(new ExprCol(result.get(), "0"));
+				// redraw();
+			} catch (Exception e) {
 				new Alert(Alert.AlertType.ERROR, "Fonction incorrecte", ButtonType.CLOSE).showAndWait();
 			}
 		}
 	}
 
-	public void remove(){
+	public void remove() {
 		int i;
-		if(!funList.getSelectionModel().isEmpty()) {
-			for(i=0; i<functions.size() && !funList.getSelectionModel().selectedItemProperty().getValue().toString().equals(functions.get(i).toString()); i++) ;
+		// if (!funList.getSelectionModel().isEmpty()) {
+		// for (i = 0; i < functions.size() &&
+		// !funList.getSelectionModel().selectedItemProperty().getValue()
+		// .toString().equals(functions.get(i).toString()); i++)
+		// ;
+		// funList.getItems().remove(funList.getSelectionModel().getSelectedIndex());
+		// }
+		if (!funTab.getSelectionModel().isEmpty()) {
+			for (i = 0; i < functions.size() && !funTab.getSelectionModel().getSelectedItem().getExpression()
+					.equals(functions.get(i).toString()); i++)
+				;
 			functions.remove(functions.get(i));
-			funList.getItems().remove(funList.getSelectionModel().getSelectedIndex());
+			funOList.remove(funTab.getSelectionModel().getSelectedIndex());
+			// redraw();
+		}
+	}
+
+	public void updateList(String update, String downdate, int index) {
+		try {
+			functions.set(index, FunctionFactory.createFunction(update));
+			funTab.getItems().get(index).setExpression(update);
+			redraw();
+		} catch (Exception e) {
+			funOList.get(index).setExpression(downdate);
+			funTab.edit(index, funTab.getColumns().get(0));
+			new Alert(Alert.AlertType.ERROR, "Fonction incorrecte", ButtonType.CLOSE).showAndWait();
 		}
 	}
 
@@ -417,6 +481,12 @@ public class GrapherCanvas extends Canvas {
 		public void onChanged(Change arg0) {
 			redraw();
 		}
+	}
 
+	class tabListen implements ListChangeListener<ExprCol> {
+
+		public void onChanged(Change arg0) {
+			redraw();
+		}
 	}
 }

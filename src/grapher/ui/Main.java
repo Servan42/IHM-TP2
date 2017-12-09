@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,6 +15,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -29,34 +31,42 @@ public class Main extends Application {
 		BorderPane root = new BorderPane();
 
 		/*
-		 * https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/table-view.htm
+		 * https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/table-view.
+		 * htm
 		 */
-		
+
 		TableView<ExprCol> table = new TableView();
-		table.setEditable(true);
 		TableColumn expressionCol = new TableColumn("Expression");
 		TableColumn colorCol = new TableColumn("Couleur");
+
 		expressionCol.setEditable(true);
 		colorCol.setEditable(true);
-		expressionCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		// expressionCol.setCellFactory(TextFieldTableCell.<ExprCol>forTableColumn());
+
+		table.setEditable(true);
+
 		table.getColumns().addAll(expressionCol, colorCol);
-		
-		expressionCol.setCellValueFactory(
-                new PropertyValueFactory<>("expression"));
-		colorCol.setCellValueFactory(
-                new PropertyValueFactory<>("color"));
-		
-		ObservableList<ExprCol> data = FXCollections.observableArrayList(
-	            new ExprCol("ccdcd","csdv"),
-	            new ExprCol("lih","lihg")
-			);
-		
+
+		expressionCol.setCellValueFactory(new PropertyValueFactory<>("expression"));
+		colorCol.setCellValueFactory(new PropertyValueFactory<>("color"));
+
+		ObservableList<ExprCol> data = FXCollections.observableArrayList();
+		for (String f : getParameters().getRaw())
+			data.add(new ExprCol(f, "0"));
+
 		table.setItems(data);
 
 		ListView<String> funList = new ListView<String>();
 		funList.getItems().addAll(getParameters().getRaw());
 
-		GrapherCanvas canvas = new GrapherCanvas(getParameters(), funList);
+		GrapherCanvas canvas = new GrapherCanvas(getParameters(), table, data);
+
+		expressionCol.setCellFactory(TextFieldTableCell.<ExprCol>forTableColumn());
+		expressionCol.setOnEditCommit((Event t) -> {
+			canvas.updateList(((CellEditEvent<ExprCol, String>) t).getNewValue(),
+					((CellEditEvent<ExprCol, String>) t).getOldValue(),
+					((CellEditEvent<ExprCol, String>) t).getTablePosition().getRow());
+		});
 
 		root.setCenter(canvas);
 
@@ -111,29 +121,31 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
-	public static class ExprCol{
+
+	public static class ExprCol {
 		private SimpleStringProperty expression;
 		private SimpleStringProperty color;
-		
-		private ExprCol(String expression, String color){
+
+		public ExprCol(String expression, String color) {
 			this.expression = new SimpleStringProperty(expression);
 			this.color = new SimpleStringProperty(color);
 		}
-		
-		public SimpleStringProperty getExpression() {
-			return expression;
+
+		public String getExpression() {
+			return expression.get();
 		}
+
 		public void setExpression(String expression) {
 			this.expression.set(expression);
 		}
-		public SimpleStringProperty getColor() {
-			return color;
+
+		public String getColor() {
+			return color.get();
 		}
+
 		public void setColor(String color) {
 			this.color.set(color);
 		}
-		
-		
+
 	}
 }
