@@ -55,13 +55,13 @@ public class Main extends Application {
 		MenuItem MenuItemDel = new MenuItem("Supprimer");
 		MenuItemDel.setOnAction(eventDel);
 		MenuItemDel.setAccelerator(new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN));
-		
+
 		Menu menu1 = new Menu("Expression");
 		menu1.getItems().add(MenuItemAdd);
 		menu1.getItems().add(MenuItemDel);
-		
+
 		MenuBar menubar = new MenuBar(menu1);
-		
+
 		BorderPane listSide = new BorderPane();
 		listSide.setCenter(funList);
 		listSide.setBottom(boutons);
