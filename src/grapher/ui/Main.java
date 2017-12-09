@@ -23,35 +23,31 @@ public class Main extends Application {
 		GrapherCanvas canvas = new GrapherCanvas(getParameters(), funList);
 		
 		root.setCenter(canvas);
+		
+		EventHandler<ActionEvent> eventAdd = new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+		        canvas.add();
+		    }
+		};
+		
+		EventHandler<ActionEvent> eventDel = new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+		        canvas.remove();
+		    }
+		};
 
 		Button buttonP = new Button("+");
-		buttonP.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent arg0) {
-				canvas.add();
-			}
-		});
+		buttonP.setOnAction(eventAdd);
 		Button buttonM = new Button("-");
-		buttonM.setOnAction(new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent arg0) {
-				canvas.remove();
-			}
-		});
+		buttonM.setOnAction(eventDel);
 		ToolBar boutons = new ToolBar(buttonP, buttonM);
 
 		// HBox boutons = new HBox(new Button("+"),new Button("-"));
 
 		MenuItem MenuItemAdd = new MenuItem("Ajouter...");
-		MenuItemAdd.setOnAction(new EventHandler<ActionEvent>() {
-		    public void handle(ActionEvent e) {
-		        canvas.add();
-		    }
-		});
+		MenuItemAdd.setOnAction(eventAdd);
 		MenuItem MenuItemDel = new MenuItem("Supprimer");
-		MenuItemDel.setOnAction(new EventHandler<ActionEvent>() {
-		    public void handle(ActionEvent e) {
-		        canvas.remove();
-		    }
-		});
+		MenuItemDel.setOnAction(eventDel);
 		
 		Menu menu1 = new Menu("Expression");
 		menu1.getItems().add(MenuItemAdd);
