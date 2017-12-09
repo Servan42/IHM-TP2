@@ -28,9 +28,9 @@ public class Main extends Application {
 		funList.getItems().addAll(getParameters().getRaw());
 
 		GrapherCanvas canvas = new GrapherCanvas(getParameters(), funList);
-		
+
 		root.setCenter(canvas);
-		
+
 		EventHandler<ActionEvent> eventAdd = new EventHandler<ActionEvent>() {
 		    public void handle(ActionEvent e) {
 		        canvas.add();
