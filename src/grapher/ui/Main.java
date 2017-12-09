@@ -1,6 +1,8 @@
 package grapher.ui;
 
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -16,9 +18,23 @@ public class Main extends Application {
 		ListView<String> funList = new ListView<String>();
 		funList.getItems().addAll(getParameters().getRaw());
 
-		root.setCenter(new GrapherCanvas(getParameters(), funList));
+		GrapherCanvas canvas = new GrapherCanvas(getParameters(), funList);
+		
+		root.setCenter(canvas);
 
-		ToolBar boutons = new ToolBar(new Button("+"), new Button("-"));
+		Button buttonP = new Button("+");
+		buttonP.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent arg0) {
+				canvas.add();
+			}
+		});
+		Button buttonM = new Button("-");
+		buttonM.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent arg0) {
+				canvas.remove();
+			}
+		});
+		ToolBar boutons = new ToolBar(buttonP, buttonM);
 
 		// HBox boutons = new HBox(new Button("+"),new Button("-"));
 
