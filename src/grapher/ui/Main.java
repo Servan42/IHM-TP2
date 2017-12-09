@@ -6,6 +6,9 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
@@ -37,12 +40,34 @@ public class Main extends Application {
 
 		// HBox boutons = new HBox(new Button("+"),new Button("-"));
 
-		BorderPane listAndButtons = new BorderPane();
-		listAndButtons.setCenter(funList);
-		listAndButtons.setBottom(boutons);
+		MenuItem MenuItemAdd = new MenuItem("Ajouter...");
+		MenuItemAdd.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+		        canvas.add();
+		    }
+		});
+		MenuItem MenuItemDel = new MenuItem("Supprimer");
+		MenuItemDel.setOnAction(new EventHandler<ActionEvent>() {
+		    public void handle(ActionEvent e) {
+		        canvas.remove();
+		    }
+		});
+		
+		Menu menu1 = new Menu("Expression");
+		menu1.getItems().add(MenuItemAdd);
+		menu1.getItems().add(MenuItemDel);
+		
+		Menu menu2 = new Menu("Couleur");
+		
+		MenuBar menubar = new MenuBar(menu1,menu2);
+		
+		BorderPane listSide = new BorderPane();
+		listSide.setCenter(funList);
+		listSide.setBottom(boutons);
+		listSide.setTop(menubar);
 
 		SplitPane fenetre = new SplitPane();
-		fenetre.getItems().addAll(listAndButtons, root);
+		fenetre.getItems().addAll(listSide, root);
 
 		BorderPane global = new BorderPane();
 		global.setCenter(fenetre);
