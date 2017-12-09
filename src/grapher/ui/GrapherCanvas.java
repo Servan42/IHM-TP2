@@ -35,14 +35,16 @@ public class GrapherCanvas extends Canvas {
 
 	protected double xmin, xmax;
 	protected double ymin, ymax;
-	
-	protected Point2D rbd = new Point2D(0,0); // point haut gauche du rectangle de zoom
-	protected Point2D rhg = new Point2D(0,0); // point bas droite du rectangle de zoom
+
+	protected Point2D rbd = new Point2D(0, 0); // point haut gauche du rectangle
+												// de zoom
+	protected Point2D rhg = new Point2D(0, 0); // point bas droite du rectangle
+												// de zoom
 
 	protected Vector<Function> functions = new Vector<Function>();
 
 	protected ListView funList;
-	
+
 	public GrapherCanvas(Parameters params) {
 		super(WIDTH, HEIGHT);
 		xmin = -PI / 2.;
@@ -52,12 +54,12 @@ public class GrapherCanvas extends Canvas {
 
 		addEventHandler(MouseEvent.ANY, new Handler());
 		addEventHandler(ScrollEvent.ANY, new SHandler());
-		
+
 		for (String param : params.getRaw()) {
 			functions.add(FunctionFactory.createFunction(param));
 		}
 	}
-	
+
 	public GrapherCanvas(Parameters params, ListView funList) {
 		super(WIDTH, HEIGHT);
 		xmin = -PI / 2.;
@@ -67,7 +69,7 @@ public class GrapherCanvas extends Canvas {
 
 		addEventHandler(MouseEvent.ANY, new Handler());
 		addEventHandler(ScrollEvent.ANY, new SHandler());
-		
+
 		for (String param : params.getRaw()) {
 			functions.add(FunctionFactory.createFunction(param));
 		}
@@ -136,9 +138,10 @@ public class GrapherCanvas extends Canvas {
 
 		// tracé du rectangle de zoom éventuel
 		gc.setLineDashes(5);
-		gc.strokeRect(rhg.getX(), rhg.getY(), max(rbd.getX(),rhg.getX())-min(rhg.getX(),rbd.getX()), max(rhg.getY(),rbd.getY())-min(rbd.getY(),rhg.getY()));
+		gc.strokeRect(rhg.getX(), rhg.getY(), max(rbd.getX(), rhg.getX()) - min(rhg.getX(), rbd.getX()),
+				max(rhg.getY(), rbd.getY()) - min(rbd.getY(), rhg.getY()));
 		gc.setLineDashes(0);
-		
+
 		// x values
 		final int N = (int) (W / STEP + 1);
 		final double dx = dx(STEP);
@@ -156,16 +159,17 @@ public class GrapherCanvas extends Canvas {
 			for (int i = 0; i < N; i++) {
 				Ys[i] = Y(f.y(xs[i]));
 			}
-			
-			if(!funList.getSelectionModel().isEmpty() && funList.getSelectionModel().selectedItemProperty().getValue().toString().equals(f.toString()))
+
+			if (!funList.getSelectionModel().isEmpty()
+					&& funList.getSelectionModel().selectedItemProperty().getValue().toString().equals(f.toString()))
 				gc.setLineWidth(2);
 			else
 				gc.setLineWidth(1);
 
 			gc.strokePolyline(Xs, Ys, N);
-			
+
 		}
-		
+
 		gc.restore(); // restoring no clipping
 
 		// axes
@@ -317,9 +321,9 @@ public class GrapherCanvas extends Canvas {
 					break;
 				case "MOUSE_DRAGGED":
 					state = State.DRAGGED;
-					if(button==1)
+					if (button == 1)
 						setCursor(Cursor.CLOSED_HAND);
-					else if(button==2)
+					else if (button == 2)
 						setCursor(Cursor.CROSSHAIR);
 					break;
 				default:
@@ -331,8 +335,8 @@ public class GrapherCanvas extends Canvas {
 				case "MOUSE_RELEASED":
 					if (button == 2) {
 						p2 = new Point2D(e.getX(), e.getY());
-						rbd = new Point2D(0,0);
-						rhg = new Point2D(0,0);
+						rbd = new Point2D(0, 0);
+						rhg = new Point2D(0, 0);
 						zoom(p, p2);
 					}
 					state = State.IDLE;
@@ -344,8 +348,8 @@ public class GrapherCanvas extends Canvas {
 						p = new Point2D(e.getX(), e.getY());
 					}
 					if (button == 2) {
-						rhg = new Point2D(min(p.getX(),p2.getX()),min(p.getY(),p2.getY()));
-						rbd = new Point2D(max(p.getX(),p2.getX()),max(p.getY(),p2.getY()));
+						rhg = new Point2D(min(p.getX(), p2.getX()), min(p.getY(), p2.getY()));
+						rbd = new Point2D(max(p.getX(), p2.getX()), max(p.getY(), p2.getY()));
 						redraw();
 						p2 = new Point2D(e.getX(), e.getY());
 					}
@@ -359,24 +363,9 @@ public class GrapherCanvas extends Canvas {
 				break;
 			}
 
-			// if(e.getEventType().getName() == "MOUSE_PRESSED"){
-			// p = new Point2D(e.getX(), e.getY());
-			// if(e.isPrimaryButtonDown()) button = 1;
-			// if(e.isSecondaryButtonDown()) button = 2;
-			// }
-			// if(e.getEventType().getName() == "MOUSE_DRAGGED" && button == 1){
-			// translate(e.getX()-p.getX(),e.getY()-p.getY());
-			// p = new Point2D(e.getX(), e.getY());
-			//
-			// }
-			// if(e.getEventType().getName()=="MOUSE_RELEASED" && button == 2){
-			// p2 = new Point2D(e.getX(), e.getY());
-			// zoom(p, p2);
-			// }
-
 		}
 	}
-	
+
 	class SHandler implements EventHandler<ScrollEvent> {
 		public void handle(ScrollEvent e) {
 			if (e.getEventType().getName() == "SCROLL") {
@@ -388,12 +377,12 @@ public class GrapherCanvas extends Canvas {
 			}
 		}
 	}
-	
-	class listListen implements ListChangeListener<String>{
+
+	class listListen implements ListChangeListener<String> {
 
 		public void onChanged(Change arg0) {
 			redraw();
 		}
-		
+
 	}
 }
