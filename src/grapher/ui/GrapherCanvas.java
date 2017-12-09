@@ -2,6 +2,7 @@ package grapher.ui;
 
 import static java.lang.Math.*;
 
+import java.util.Optional;
 import java.util.Vector;
 
 import javafx.util.converter.DoubleStringConverter;
@@ -13,7 +14,11 @@ import javafx.geometry.Point2D;
 
 import javafx.scene.paint.Color;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.Cursor;
@@ -285,9 +290,25 @@ public class GrapherCanvas extends Canvas {
 	}
 
 	public void add(){
+		Optional<String> result;
+		TextInputDialog box = new TextInputDialog("Votre fonction");
+		box.setHeaderText("Expression");
+		box.setContentText("Nouvelle expression");
+		box.setTitle("Expression");
 		
+		result = box.showAndWait();
+		
+		if(result.isPresent()) {
+			try {
+				functions.add(FunctionFactory.createFunction(result.get()));
+				funList.getItems().add(result.get());
+				redraw();
+			} catch(Exception e) {
+				new Alert(Alert.AlertType.ERROR, "Fonction incorrecte", ButtonType.CLOSE).showAndWait();
+			}
+		}
 	}
-	
+
 	public void remove(){
 		int i;
 		if(!funList.getSelectionModel().isEmpty()) {
@@ -296,7 +317,7 @@ public class GrapherCanvas extends Canvas {
 			funList.getItems().remove(funList.getSelectionModel().getSelectedIndex());
 		}
 	}
-	
+
 	class Handler implements EventHandler<MouseEvent> {
 		Point2D p;
 		Point2D p2;
