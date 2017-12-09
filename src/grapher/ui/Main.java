@@ -49,8 +49,6 @@ public class Main extends Application {
 		buttonM.setOnAction(eventDel);
 		ToolBar boutons = new ToolBar(buttonP, buttonM);
 
-		// HBox boutons = new HBox(new Button("+"),new Button("-"));
-
 		MenuItem MenuItemAdd = new MenuItem("Ajouter...");
 		MenuItemAdd.setOnAction(eventAdd);
 		MenuItemAdd.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
