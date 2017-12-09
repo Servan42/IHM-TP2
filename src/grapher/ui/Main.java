@@ -11,6 +11,9 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToolBar;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -46,8 +49,10 @@ public class Main extends Application {
 
 		MenuItem MenuItemAdd = new MenuItem("Ajouter...");
 		MenuItemAdd.setOnAction(eventAdd);
+		MenuItemAdd.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
 		MenuItem MenuItemDel = new MenuItem("Supprimer");
 		MenuItemDel.setOnAction(eventDel);
+		MenuItemDel.setAccelerator(new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN));
 		
 		Menu menu1 = new Menu("Expression");
 		menu1.getItems().add(MenuItemAdd);
