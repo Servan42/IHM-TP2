@@ -1,6 +1,9 @@
 package grapher.ui;
 
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -13,6 +16,8 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -22,13 +27,32 @@ import javafx.stage.Stage;
 public class Main extends Application {
 	public void start(Stage stage) {
 		BorderPane root = new BorderPane();
+
+		/*
+		 * https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/table-view.htm
+		 */
 		
-		TableView<String> table = new TableView();
-		//table.setEditable(false);
+		TableView<ExprCol> table = new TableView();
+		table.setEditable(true);
 		TableColumn expressionCol = new TableColumn("Expression");
 		TableColumn colorCol = new TableColumn("Couleur");
-		table.getColumns().addAll(expressionCol,colorCol);
+		expressionCol.setEditable(true);
+		colorCol.setEditable(true);
+		expressionCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		table.getColumns().addAll(expressionCol, colorCol);
 		
+		expressionCol.setCellValueFactory(
+                new PropertyValueFactory<>("expression"));
+		colorCol.setCellValueFactory(
+                new PropertyValueFactory<>("color"));
+		
+		ObservableList<ExprCol> data = FXCollections.observableArrayList(
+	            new ExprCol("ccdcd","csdv"),
+	            new ExprCol("lih","lihg")
+			);
+		
+		table.setItems(data);
+
 		ListView<String> funList = new ListView<String>();
 		funList.getItems().addAll(getParameters().getRaw());
 
@@ -37,15 +61,15 @@ public class Main extends Application {
 		root.setCenter(canvas);
 
 		EventHandler<ActionEvent> eventAdd = new EventHandler<ActionEvent>() {
-		    public void handle(ActionEvent e) {
-		        canvas.add();
-		    }
+			public void handle(ActionEvent e) {
+				canvas.add();
+			}
 		};
-		
+
 		EventHandler<ActionEvent> eventDel = new EventHandler<ActionEvent>() {
-		    public void handle(ActionEvent e) {
-		        canvas.remove();
-		    }
+			public void handle(ActionEvent e) {
+				canvas.remove();
+			}
 		};
 
 		Button buttonP = new Button("+");
@@ -68,7 +92,7 @@ public class Main extends Application {
 		MenuBar menubar = new MenuBar(menu1);
 
 		BorderPane listSide = new BorderPane();
-		//listSide.setCenter(funList);
+		// listSide.setCenter(funList);
 		listSide.setCenter(table);
 		listSide.setBottom(boutons);
 
@@ -86,5 +110,30 @@ public class Main extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
+	}
+	
+	public static class ExprCol{
+		private SimpleStringProperty expression;
+		private SimpleStringProperty color;
+		
+		private ExprCol(String expression, String color){
+			this.expression = new SimpleStringProperty(expression);
+			this.color = new SimpleStringProperty(color);
+		}
+		
+		public SimpleStringProperty getExpression() {
+			return expression;
+		}
+		public void setExpression(String expression) {
+			this.expression.set(expression);
+		}
+		public SimpleStringProperty getColor() {
+			return color;
+		}
+		public void setColor(String color) {
+			this.color.set(color);
+		}
+		
+		
 	}
 }
