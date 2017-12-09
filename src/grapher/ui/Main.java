@@ -58,20 +58,18 @@ public class Main extends Application {
 		menu1.getItems().add(MenuItemAdd);
 		menu1.getItems().add(MenuItemDel);
 		
-		Menu menu2 = new Menu("Couleur");
-		
-		MenuBar menubar = new MenuBar(menu1,menu2);
+		MenuBar menubar = new MenuBar(menu1);
 		
 		BorderPane listSide = new BorderPane();
 		listSide.setCenter(funList);
 		listSide.setBottom(boutons);
-		listSide.setTop(menubar);
 
 		SplitPane fenetre = new SplitPane();
 		fenetre.getItems().addAll(listSide, root);
 
 		BorderPane global = new BorderPane();
 		global.setCenter(fenetre);
+		global.setTop(menubar);
 
 		stage.setTitle("Grapher");
 		stage.setScene(new Scene(global));
