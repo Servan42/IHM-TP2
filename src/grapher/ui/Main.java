@@ -1,6 +1,8 @@
 package grapher.ui;
 
 import javafx.application.Application;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -21,6 +23,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.ToolBar;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.KeyCode;
@@ -28,7 +31,9 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 public class Main extends Application {
 	public void start(Stage stage) {
@@ -41,7 +46,7 @@ public class Main extends Application {
 
 		TableView<ExprCol> table = new TableView<ExprCol>();
 		TableColumn<ExprCol, String> expressionCol = new <ExprCol, String>TableColumn("Expression");
-		TableColumn<ExprCol, String> colorCol = new <ExprCol, String>TableColumn("Couleur");
+		TableColumn<ExprCol, Color> colorCol = new <ExprCol, Color>TableColumn("Couleur");
 
 		expressionCol.setEditable(true);
 		colorCol.setEditable(true);
@@ -51,11 +56,12 @@ public class Main extends Application {
 		table.getColumns().addAll(expressionCol, colorCol);
 
 		expressionCol.setCellValueFactory(new PropertyValueFactory<>("expression"));
-		colorCol.setCellValueFactory(new PropertyValueFactory<>("color"));
-
+//		colorCol.setCellValueFactory(new PropertyValueFactory<>("color"));
+		colorCol.setCellValueFactory(d -> d.getValue().color);
+		
 		ObservableList<ExprCol> data = FXCollections.observableArrayList();
 		for (String f : getParameters().getRaw())
-			data.add(new ExprCol(f, "black"));
+			data.add(new ExprCol(f, Color.BLACK));
 
 		table.setItems(data);
 
@@ -70,12 +76,33 @@ public class Main extends Application {
 					((CellEditEvent<ExprCol, String>) t).getOldValue(),
 					((CellEditEvent<ExprCol, String>) t).getTablePosition().getRow());
 		});
-		
-		colorCol.setCellFactory(TextFieldTableCell.<ExprCol>forTableColumn());
-		colorCol.setOnEditCommit((TableColumn.CellEditEvent<Main.ExprCol,String> t) -> {
-			table.getItems().get(((CellEditEvent<ExprCol, String>) t).getTablePosition().getRow()).setColor(((CellEditEvent<ExprCol, String>) t).getNewValue());
-			canvas.updateCol();
+
+		colorCol.setCellFactory((TableColumn<ExprCol, Color> col) -> new TableCell<ExprCol, Color>(){
+			private final ColorPicker cp = new ColorPicker() {{
+				setOnShowing (e -> table.edit(getTableRow().getIndex(), col)); 
+				valueProperty().addListener((value, oldVal, newVal) -> {if(isEditing()) { commitEdit(newVal); canvas.updateCol();}}); 
+			}};
+			
+			public void updateItem(Color item, boolean empty) {
+				super.updateItem(item, empty);
+				cp.setValue(item);
+				if (empty || item == null) {
+			         setGraphic(null);
+			     } else {
+			         setGraphic(cp);
+			     }
+			}
 		});
+		
+//		colorCol.setCellFactory(ColorPickerTableCell.<ExprCol, Color>forTableColumn());
+//		colorCol.setOnEditCommit((TableColumn.CellEditEvent<Main.ExprCol, Color> t) -> {
+//			table.getItems().get(((CellEditEvent<ExprCol, Color>) t).getTablePosition().getRow()).setColor(((CellEditEvent<ExprCol, Color>) t).getNewValue());
+//			canvas.updateCol();
+//		});
+		
+//		colorCol.setOnEditStart((TableColumn.CellEditEvent<Main.ExprCol, Color> t) -> {
+//			new ColorPicker();
+//		});
 		
 		root.setCenter(canvas);
 
@@ -132,11 +159,11 @@ public class Main extends Application {
 
 	public static class ExprCol {
 		private SimpleStringProperty expression;
-		private SimpleStringProperty color;
+		private ObjectProperty<Color> color;
 
-		public ExprCol(String expression, String color) {
+		public ExprCol(String expression, Color color) {
 			this.expression = new SimpleStringProperty(expression);
-			this.color = new SimpleStringProperty(color);
+			this.color = new SimpleObjectProperty<Color>(color);
 		}
 
 		public String getExpression() {
@@ -147,13 +174,54 @@ public class Main extends Application {
 			this.expression.set(expression);
 		}
 
-		public String getColor() {
+		public Color getColor() {
 			return color.get();
 		}
 
-		public void setColor(String color) {
+		public void setColor(Color color) {
 			this.color.set(color);
 		}
 
-	}	
+	}
+
+	public static class ColorPickerTableCell extends ComboBoxTableCell<ExprCol, Color> {
+		final ColorPicker cp = new ColorPicker();
+
+		public ColorPickerTableCell() {
+			super();
+			this.getItems().add(new Color(0, 1, 0, 1));
+			this.getItems().add(new Color(0, 1, 0, 1));
+			this.getItems().add(new Color(0, 1, 0, 1));
+			this.getItems().add(new Color(0, 1, 0, 1));
+			this.getItems().add(new Color(0, 1, 0, 1));
+			cp.setOnAction(new EventHandler() {
+				public void handle(Event t) {
+					Color c = cp.getValue();
+					System.out.println("New Color's RGB = " + c.getRed() + " " + c.getGreen() + " " + c.getBlue());
+				}
+			});
+			cp.getStyleClass().add("button");
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public void updateItem(Color item, boolean empty) {
+			// cp.show();
+
+			// super.updateItem(item, empty);
+			// this.getItems().add(new Color(0,1,0,1));
+			// this.getItems().add(new Color(0,1,0,1));
+			// this.getItems().add(new Color(0,1,0,1));
+			// this.getItems().add(new Color(0,1,0,1));
+			// this.getItems().add(new Color(0,1,0,1));
+			// cp.setVisible(true);
+
+			if (empty || item == null) {
+				setText(null);
+				setGraphic(null);
+			} else {
+				setGraphic(cp);
+			}
+		}
+	}
 }

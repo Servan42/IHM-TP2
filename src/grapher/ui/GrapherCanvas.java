@@ -198,7 +198,7 @@ public class GrapherCanvas extends Canvas {
 			for(j = 0; j<funTab.getItems().size() && !funTab.getItems().get(j).getExpression().equals(f.toString()); j++) ;
 			
 			try{
-				gc.setStroke(Paint.valueOf(funTab.getItems().get(j).getColor()));
+				gc.setStroke(Paint.valueOf(funTab.getItems().get(j).getColor().toString()));
 			} catch (Exception e) {
 				gc.setStroke(Paint.valueOf("black"));;
 			}
@@ -332,7 +332,7 @@ public class GrapherCanvas extends Canvas {
 		if (result.isPresent()) {
 			try {
 				functions.add(FunctionFactory.createFunction(result.get()));
-				funOList.add(new ExprCol(result.get(), "black"));
+				funOList.add(new ExprCol(result.get(), Color.BLACK));
 			} catch (Exception e) {
 				new Alert(Alert.AlertType.ERROR, "Fonction incorrecte", ButtonType.CLOSE).showAndWait();
 			}
