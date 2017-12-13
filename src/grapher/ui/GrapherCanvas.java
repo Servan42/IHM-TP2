@@ -4,18 +4,6 @@ import static java.lang.Math.*;
 
 import java.util.Optional;
 import java.util.Vector;
-
-import javax.xml.transform.ErrorListener;
-import javax.xml.transform.TransformerException;
-
-import org.w3c.dom.Node;
-import org.w3c.dom.traversal.NodeIterator;
-
-import com.sun.org.apache.xalan.internal.extensions.ExpressionContext;
-import com.sun.org.apache.xml.internal.utils.QName;
-import com.sun.org.apache.xpath.internal.XPathContext;
-import com.sun.org.apache.xpath.internal.objects.XObject;
-
 import javafx.util.converter.DoubleStringConverter;
 
 import javafx.application.Application.Parameters;
@@ -25,11 +13,12 @@ import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
 
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.MouseEvent;
@@ -115,7 +104,6 @@ public class GrapherCanvas extends Canvas {
 		this.funOList = funOList;
 		funTab.getSelectionModel().getSelectedItems().addListener(new tabListen());
 		funOList.addListener(new tabListen());
-		// funList.getSelectionModel().getSelectedItems().addListener(new listListen());
 	}
 
 	public double minHeight(double width) {
@@ -145,6 +133,7 @@ public class GrapherCanvas extends Canvas {
 	}
 
 	private void redraw() {
+		int j;
 		GraphicsContext gc = getGraphicsContext2D();
 		W = getWidth();
 		H = getHeight();
@@ -195,23 +184,24 @@ public class GrapherCanvas extends Canvas {
 		}
 
 		for (Function f : functions) {
-			// y values
 			double Ys[] = new double[N];
 			for (int i = 0; i < N; i++) {
 				Ys[i] = Y(f.y(xs[i]));
 			}
 
-			// if (!funList.getSelectionModel().isEmpty()
-			// &&
-			// funList.getSelectionModel().selectedItemProperty().getValue().toString().equals(f.toString()))
-			// gc.setLineWidth(2);
-			// else
 			if (!funTab.getSelectionModel().isEmpty()
 					&& funTab.getSelectionModel().getSelectedItem().getExpression().equals(f.toString()))
 				gc.setLineWidth(2);
 			else
 				gc.setLineWidth(1);
 
+			for(j = 0; j<funTab.getItems().size() && !funTab.getItems().get(j).getExpression().equals(f.toString()); j++) ;
+			
+			try{
+				gc.setStroke(Paint.valueOf(funTab.getItems().get(j).getColor()));
+			} catch (Exception e) {
+				gc.setStroke(Paint.valueOf("black"));;
+			}
 			gc.strokePolyline(Xs, Ys, N);
 
 		}
@@ -342,9 +332,7 @@ public class GrapherCanvas extends Canvas {
 		if (result.isPresent()) {
 			try {
 				functions.add(FunctionFactory.createFunction(result.get()));
-				// funList.getItems().add(result.get());
-				funOList.add(new ExprCol(result.get(), "0"));
-				// redraw();
+				funOList.add(new ExprCol(result.get(), "black"));
 			} catch (Exception e) {
 				new Alert(Alert.AlertType.ERROR, "Fonction incorrecte", ButtonType.CLOSE).showAndWait();
 			}
@@ -353,33 +341,28 @@ public class GrapherCanvas extends Canvas {
 
 	public void remove() {
 		int i;
-		// if (!funList.getSelectionModel().isEmpty()) {
-		// for (i = 0; i < functions.size() &&
-		// !funList.getSelectionModel().selectedItemProperty().getValue()
-		// .toString().equals(functions.get(i).toString()); i++)
-		// ;
-		// funList.getItems().remove(funList.getSelectionModel().getSelectedIndex());
-		// }
 		if (!funTab.getSelectionModel().isEmpty()) {
 			for (i = 0; i < functions.size() && !funTab.getSelectionModel().getSelectedItem().getExpression()
 					.equals(functions.get(i).toString()); i++)
 				;
 			functions.remove(functions.get(i));
 			funOList.remove(funTab.getSelectionModel().getSelectedIndex());
-			// redraw();
 		}
 	}
 
-	public void updateList(String update, String downdate, int index) {
+	public void updateFun(String update, String downdate, int index) {
 		try {
 			functions.set(index, FunctionFactory.createFunction(update));
 			funTab.getItems().get(index).setExpression(update);
 			redraw();
 		} catch (Exception e) {
-			funOList.get(index).setExpression(downdate);
-			funTab.edit(index, funTab.getColumns().get(0));
+			TableColumn.editCancelEvent();
 			new Alert(Alert.AlertType.ERROR, "Fonction incorrecte", ButtonType.CLOSE).showAndWait();
 		}
+	}
+	
+	public void updateCol() {
+		redraw();
 	}
 
 	class Handler implements EventHandler<MouseEvent> {

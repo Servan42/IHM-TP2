@@ -9,11 +9,14 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
@@ -24,6 +27,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -35,13 +39,12 @@ public class Main extends Application {
 		 * htm
 		 */
 
-		TableView<ExprCol> table = new TableView();
-		TableColumn expressionCol = new TableColumn("Expression");
-		TableColumn colorCol = new TableColumn("Couleur");
+		TableView<ExprCol> table = new TableView<ExprCol>();
+		TableColumn<ExprCol, String> expressionCol = new <ExprCol, String>TableColumn("Expression");
+		TableColumn<ExprCol, String> colorCol = new <ExprCol, String>TableColumn("Couleur");
 
 		expressionCol.setEditable(true);
 		colorCol.setEditable(true);
-		// expressionCol.setCellFactory(TextFieldTableCell.<ExprCol>forTableColumn());
 
 		table.setEditable(true);
 
@@ -52,7 +55,7 @@ public class Main extends Application {
 
 		ObservableList<ExprCol> data = FXCollections.observableArrayList();
 		for (String f : getParameters().getRaw())
-			data.add(new ExprCol(f, "0"));
+			data.add(new ExprCol(f, "black"));
 
 		table.setItems(data);
 
@@ -62,12 +65,18 @@ public class Main extends Application {
 		GrapherCanvas canvas = new GrapherCanvas(getParameters(), table, data);
 
 		expressionCol.setCellFactory(TextFieldTableCell.<ExprCol>forTableColumn());
-		expressionCol.setOnEditCommit((Event t) -> {
-			canvas.updateList(((CellEditEvent<ExprCol, String>) t).getNewValue(),
+		expressionCol.setOnEditCommit((TableColumn.CellEditEvent<Main.ExprCol,String> t) -> {
+			canvas.updateFun(((CellEditEvent<ExprCol, String>) t).getNewValue(),
 					((CellEditEvent<ExprCol, String>) t).getOldValue(),
 					((CellEditEvent<ExprCol, String>) t).getTablePosition().getRow());
 		});
-
+		
+		colorCol.setCellFactory(TextFieldTableCell.<ExprCol>forTableColumn());
+		colorCol.setOnEditCommit((TableColumn.CellEditEvent<Main.ExprCol,String> t) -> {
+			table.getItems().get(((CellEditEvent<ExprCol, String>) t).getTablePosition().getRow()).setColor(((CellEditEvent<ExprCol, String>) t).getNewValue());
+			canvas.updateCol();
+		});
+		
 		root.setCenter(canvas);
 
 		EventHandler<ActionEvent> eventAdd = new EventHandler<ActionEvent>() {
@@ -102,7 +111,6 @@ public class Main extends Application {
 		MenuBar menubar = new MenuBar(menu1);
 
 		BorderPane listSide = new BorderPane();
-		// listSide.setCenter(funList);
 		listSide.setCenter(table);
 		listSide.setBottom(boutons);
 
@@ -147,5 +155,5 @@ public class Main extends Application {
 			this.color.set(color);
 		}
 
-	}
+	}	
 }
