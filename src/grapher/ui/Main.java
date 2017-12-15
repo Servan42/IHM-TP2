@@ -77,6 +77,8 @@ public class Main extends Application {
 					((CellEditEvent<ExprCol, String>) t).getTablePosition().getRow());
 		});
 
+		
+		/** Code à la courtoisie de Mr. Renaud Blanch **/
 		colorCol.setCellFactory((TableColumn<ExprCol, Color> col) -> new TableCell<ExprCol, Color>(){
 			private final ColorPicker cp = new ColorPicker() {{
 				setOnShowing (e -> table.edit(getTableRow().getIndex(), col)); 
@@ -93,16 +95,8 @@ public class Main extends Application {
 			     }
 			}
 		});
+		/** **/
 		
-//		colorCol.setCellFactory(ColorPickerTableCell.<ExprCol, Color>forTableColumn());
-//		colorCol.setOnEditCommit((TableColumn.CellEditEvent<Main.ExprCol, Color> t) -> {
-//			table.getItems().get(((CellEditEvent<ExprCol, Color>) t).getTablePosition().getRow()).setColor(((CellEditEvent<ExprCol, Color>) t).getNewValue());
-//			canvas.updateCol();
-//		});
-		
-//		colorCol.setOnEditStart((TableColumn.CellEditEvent<Main.ExprCol, Color> t) -> {
-//			new ColorPicker();
-//		});
 		
 		root.setCenter(canvas);
 
@@ -182,46 +176,5 @@ public class Main extends Application {
 			this.color.set(color);
 		}
 
-	}
-
-	public static class ColorPickerTableCell extends ComboBoxTableCell<ExprCol, Color> {
-		final ColorPicker cp = new ColorPicker();
-
-		public ColorPickerTableCell() {
-			super();
-			this.getItems().add(new Color(0, 1, 0, 1));
-			this.getItems().add(new Color(0, 1, 0, 1));
-			this.getItems().add(new Color(0, 1, 0, 1));
-			this.getItems().add(new Color(0, 1, 0, 1));
-			this.getItems().add(new Color(0, 1, 0, 1));
-			cp.setOnAction(new EventHandler() {
-				public void handle(Event t) {
-					Color c = cp.getValue();
-					System.out.println("New Color's RGB = " + c.getRed() + " " + c.getGreen() + " " + c.getBlue());
-				}
-			});
-			cp.getStyleClass().add("button");
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public void updateItem(Color item, boolean empty) {
-			// cp.show();
-
-			// super.updateItem(item, empty);
-			// this.getItems().add(new Color(0,1,0,1));
-			// this.getItems().add(new Color(0,1,0,1));
-			// this.getItems().add(new Color(0,1,0,1));
-			// this.getItems().add(new Color(0,1,0,1));
-			// this.getItems().add(new Color(0,1,0,1));
-			// cp.setVisible(true);
-
-			if (empty || item == null) {
-				setText(null);
-				setGraphic(null);
-			} else {
-				setGraphic(cp);
-			}
-		}
 	}
 }
