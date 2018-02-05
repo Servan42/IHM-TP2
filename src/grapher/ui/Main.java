@@ -35,6 +35,10 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+/**
+ * 
+ * @author BLANCH CHANET CHARLOT
+ */
 public class Main extends Application {
 	public void start(Stage stage) {
 		BorderPane root = new BorderPane();

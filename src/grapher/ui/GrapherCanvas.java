@@ -29,6 +29,10 @@ import javafx.scene.canvas.Canvas;
 import grapher.fc.*;
 import grapher.ui.Main.ExprCol;
 
+/**
+ * 
+ * @author BLANCH CHANET CHARLOT
+ */
 public class GrapherCanvas extends Canvas {
 	static final double MARGIN = 40;
 	static final double STEP = 5;
